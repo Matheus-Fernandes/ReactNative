@@ -1,16 +1,33 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Button} from 'react-native';
+import Camera from './js/components/Camera.js';
+
+
 
 export default class App extends React.Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text>
-			Hello World!
-		</Text>
+  state = {
+    verCamera : true
+  };
 
-      </View>
-    );
+  render() {
+    let renderContent;
+
+    if (this.state.verCamera) 
+      renderContent = (
+          <Camera voltar={this.voltar.bind(this)}/>
+      );
+    else
+      renderContent = (
+        <View style={styles.container}>    
+          <Button title="Camera" onPress={()=>{this.setState({verCamera : true})}}/>
+        </View>
+      );
+    
+    return renderContent;
+  }
+
+  voltar(){
+    this.setState({verCamera : false});
   }
 }
 
