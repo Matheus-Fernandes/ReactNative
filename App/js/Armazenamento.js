@@ -1,11 +1,23 @@
+const CONTEXTO = "http://10.0.0.247:8180/sgm_web_adm_sistema/";
+
 export default class Armazenamento{
     static lugar = {
-        chave : null,
+        id : null,
         imagem : null,
         descricao : null,
     };
-
+    static listaLugares = [];
     static changeListeners = [];
+
+    static async carregarLugares(){
+        try {
+            const response = await fetch(CONTEXTO + "ServletLugar?operation=getLugares")
+            const listaLugares = await response.json();
+
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     static dispararChanges(){
         this.changeListeners.forEach(metodo => {
@@ -17,3 +29,5 @@ export default class Armazenamento{
         this.changeListeners.push(listener);
     }
 }
+
+Armazenamento.carregarLugares();
