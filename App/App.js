@@ -1,26 +1,27 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button} from 'react-native';
+import { StyleSheet, Text, View, Button, Image} from 'react-native';
+import Armazenamento from './js/Armazenamento.js';
 import Camera from './js/components/Camera.js';
 import Expo from 'expo';
 
-
-
 export default class App extends React.Component {
   state = {
-    verCamera : true
+    verCamera : true,
+    lugar : null
   };
 
-  render() {
-    let renderContent;
+  constructor (props){
+    super(props);
+    Armazenamento.addChangeListener(this.onChangeLugar.bind(this));
+  }
 
-    if (this.state.verCamera) 
-      renderContent = (
-          <Camera voltar={this.voltar.bind(this)}/>
-      );
-    else
-      renderContent = (
+  render() {
+      const lugar = this.state.lugar;
+      const imagem = lugar ? lugar.imagem : null;
+      return (
         <View style={styles.container}>    
-          <Button title="Camera" onPress={()=>{this.setState({verCamera : true})}}/>
+          {imagem && <Image source={{ uri: lugar.imagem.uri }}  style={{ width: 100, height: 100}}/>}
+          <Button title="Camera" onPress={Camera.tirarFoto}/>
         </View>
       );
     
@@ -30,7 +31,14 @@ export default class App extends React.Component {
   voltar(){
     this.setState({verCamera : false});
   }
+
+  onChangeLugar(){
+    this.setState({lugar : Armazenamento.lugar});
+    alert(this.state.lugar && this.state.lugar.imagem.uri);
+  }
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
