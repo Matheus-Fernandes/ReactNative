@@ -5,18 +5,29 @@ export default class Armazenamento{
         id : null,
         imagem : null,
         descricao : null,
+        longitude : null,
+		latitude : null,
     };
-    static listaLugares = [];
+    static listaLugares = [{id:"1", descricao:"vla"}];
     static changeListeners = [];
 
-    static async carregarLugares(){
+    constructor(){
+        this.carregarLugares();
+    }
+
+    static carregarLugares = async() => {
         try {
             const response = await fetch(CONTEXTO + "ServletLugar?operation=getLugares")
-            const listaLugares = await response.json();
-
+            const json = await response.json();
+            this.listaLugares = json;
+            return this.listaLugares;
         } catch (e) {
             console.log(e);
         }
+    }
+
+    static setLugares(lugares){
+        this.lugares = lugares;
     }
 
     static dispararChanges(){
@@ -29,5 +40,3 @@ export default class Armazenamento{
         this.changeListeners.push(listener);
     }
 }
-
-Armazenamento.carregarLugares();
