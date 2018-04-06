@@ -22,7 +22,7 @@ export default class Armazenamento{
             this.listaLugares = json;
             return this.listaLugares;
         } catch (e) {
-            console.log(e);
+            console.log("erroaqui" + e);
         }
     }
 
