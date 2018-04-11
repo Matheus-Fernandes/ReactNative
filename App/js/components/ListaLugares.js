@@ -1,6 +1,6 @@
 import React from 'react';
-import { TouchableOpacity , StyleSheet, FlatList, ScrollView} from 'react-native';
-import { Text } from 'native-base';
+import { TouchableOpacity , StyleSheet, FlatList, ScrollView, View} from 'react-native';
+import { Text, Header} from 'native-base';
 import Armazenamento from '../Armazenamento.js';
 import ModalLugar from './ModalLugar.js';
 
@@ -20,33 +20,44 @@ export default class ListaLugares extends React.Component {
     }
 
     renderItem = ({item}) => {
+        const nome = item.nome;
+        const descricao = item.descricao;
+        const tam = 70;
+        const abreviado = descricao.length > tam ;
         return (
             <TouchableOpacity 
                 style={[styles.row]} 
                 onPress={ () =>  this.setModal(item, true)}
             >
-                <Text>{item.descricao}</Text>
+                <Text style={{fontWeight: "bold"}}>{nome}</Text>
+                <Text>{
+                    descricao.substr(0, abreviado ? tam : descricao.length) + 
+                    (abreviado ? "..." : "")
+                }</Text>
             </TouchableOpacity >
         );
     }
 
     render() {
       let data = this.props.lugares;
-      console.log(this.state.lugar);
-
+      
       return (
-        <ScrollView>
-            <ModalLugar 
-                visible={this.state.modalVisible} 
-                onClose={() => this.setModal(null, false)}
-                lugar={this.state.lugar}
-            />
-            <FlatList 
-                style={styles.container}
-                data={data}
-                renderItem={this.renderItem}
-                keyExtractor={extractKey}/>   
-        </ScrollView>
+        this.state.modalVisible ?
+        <ModalLugar 
+            onClose={() => this.setModal(null, false)}
+            lugar={this.state.lugar}
+        /> 
+        :
+        <View style={{flex:1}}>
+            <Header/>
+            <ScrollView>
+                <FlatList 
+                    style={styles.container}
+                    data={data}
+                    renderItem={this.renderItem}
+                    keyExtractor={extractKey}/>   
+            </ScrollView>
+        </View>
       );
       
   }

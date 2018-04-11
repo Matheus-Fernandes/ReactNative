@@ -3,6 +3,7 @@ const CONTEXTO = "http://10.0.0.247:8180/sgm_web_adm_sistema/";
 export default class Armazenamento{
     static lugar = {
         id : null,
+        nome: null,
         imagem : null,
         descricao : null,
         longitude : null,
@@ -22,7 +23,39 @@ export default class Armazenamento{
             this.listaLugares = json;
             return this.listaLugares;
         } catch (e) {
-            console.log("erroaqui" + e);
+            console.log("erro aqui" + e);
+        }
+    }
+
+    static getFoto = async(endereco) => {
+        try {
+            console.log(CONTEXTO + endereco);
+            const response = await fetch(CONTEXTO + endereco)
+            return await response.text();
+        } catch (e) {
+            console.log("erro aqui" + e);
+        }
+    }
+
+    static salvar = async(item) => {
+        try {
+            const response = 
+            await fetch(CONTEXTO + "ServletLugar?operation=setLugar", {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(item),
+            });
+
+            if (response.ok){
+                
+            }
+
+            return await response.text();
+        } catch (e) {
+            console.log("erro aqui" + e);
         }
     }
 

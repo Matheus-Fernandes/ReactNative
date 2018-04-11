@@ -8,9 +8,7 @@ export default class Camera {
     });
 
     if (!result.cancelled) {
-      Armazenamento.lugar.imagem = result;
+      return result;
     }
-
-    Armazenamento.dispararChanges();
   }
 }
