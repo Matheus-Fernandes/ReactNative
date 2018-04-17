@@ -17,6 +17,7 @@ export default class ListaLugares extends React.Component {
             modalVisible: visible,
             lugar: item
         });
+
     }
 
     renderItem = ({item}) => {

@@ -10,9 +10,11 @@ const MARGIN = 30;
 export default class ModalLugar extends React.Component{
     constructor(props){
         super(props);
-        console.log(props);
+
         this.state ={
-            lugar: props.lugar
+            lugar: props.lugar,
+            carregando: false,
+            atualizado: false,
         };
     }
 
@@ -23,19 +25,28 @@ export default class ModalLugar extends React.Component{
         });
     
         if (!result.cancelled) {
-            lugar.imagem =  result.base64;
+            lugar.base64 =  result.base64;
         }
 
         this.setState({
-            lugar: lugar
+            lugar: lugar,
+            atualizado : true
         });
     }
 
     componentDidMount= async () =>  {
+        console.log("aqui");
+        console.log()
+       await this.consultarFoto();
+    }
+
+    consultarFoto = async () => {
+        this.setState({carregando : true});
         let lugar = this.state.lugar;
-        lugar.imagem = await Armazenamento.getFoto(lugar.imagem);
+        lugar.base64 = await Armazenamento.getFoto(lugar.imagem);
         this.setState({
-            lugar: lugar
+            lugar: lugar,
+            carregando: false,
         });
     }
 
@@ -76,9 +87,13 @@ export default class ModalLugar extends React.Component{
             >
                 <Header hasTabs >
                     <Right>
-                        <Button transparent onPress={() => Armazenamento.salvar(this.state.lugar)}>
-                            <Text>Salvar</Text>
-                        </Button>
+                        {
+                            this.state.atualizado ?
+                            <Button transparent onPress={() => Armazenamento.salvar(this.state.lugar)}>
+                                <Text>Salvar</Text>
+                            </Button>:
+                            null
+                        }
                     </Right>
                 </Header>
                 <Tabs>
@@ -91,7 +106,7 @@ export default class ModalLugar extends React.Component{
                                 onChangeText={(value) => {
                                     let lugar = this.state.lugar;
                                     lugar.nome = value;
-                                    this.setState({lugar : lugar})
+                                    this.setState({lugar : lugar, atualizado : true})
                                 }}
                             />
                             <Label>Descrição</Label>
@@ -99,6 +114,11 @@ export default class ModalLugar extends React.Component{
                                 style={{padding:10, paddingTop: 2, paddingBottom:16, fontSize:17, color:'#333333'}}
                                 multiline = {true}
                                 value={lugar.descricao}
+                                onChangeText={(value) => {
+                                    let lugar = this.state.lugar;
+                                    lugar.descricao = value;
+                                    this.setState({lugar : lugar, atualizado : true})
+                                }}
                             />
                         </Content>     
                     </Tab>
@@ -115,7 +135,12 @@ export default class ModalLugar extends React.Component{
                     </Tab>
                     
                     <Tab heading="Foto">
-                        <Image  source={{uri: "data:image/png;base64," + lugar.imagem}} style={{height: null, width: null, flex: 1}}/>
+                        {
+                            this.state.carregando ? 
+                            <Text>carregando ...</Text> :
+                            <Image  source={{uri: "data:image/png;base64," + lugar.base64}} style={{height: null, width: null, flex: 1}}/>
+                             
+                        }
                         <Button  full primary onPress={this.mudarFoto}>
                              <Text>Tirar Foto</Text>
                         </Button>

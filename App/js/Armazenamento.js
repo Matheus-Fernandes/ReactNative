@@ -29,8 +29,8 @@ export default class Armazenamento{
 
     static getFoto = async(endereco) => {
         try {
-            console.log(CONTEXTO + endereco);
             const response = await fetch(CONTEXTO + endereco)
+
             return await response.text();
         } catch (e) {
             console.log("erro aqui" + e);
@@ -53,7 +53,7 @@ export default class Armazenamento{
                 
             }
 
-            return await response.text();
+            return await response.json();
         } catch (e) {
             console.log("erro aqui" + e);
         }
