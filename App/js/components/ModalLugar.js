@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, Modal, TextInput, Image, View} from 'react-native';
+import { StyleSheet, Modal, TextInput, Image, View, ToastAndroid} from 'react-native';
 import {Container, Content, Form, Item, Input, Text, Label, Button, Header, Tab, Tabs, Right } from 'native-base';
-import { MapView, ImagePicker } from 'expo';
+import { MapView, ImagePicker,Permissions, Location } from 'expo';
 import Armazenamento from '../Armazenamento.js';
 import Camera from './Camera.js';
 
@@ -22,17 +22,40 @@ export default class ModalLugar extends React.Component{
         let lugar = this.state.lugar;
         let result = await ImagePicker.launchCameraAsync({
             base64: true,
+            exif: true
         });
     
         if (!result.cancelled) {
             lugar.base64 =  result.base64;
+            let l = this.getLocation(); 
+            lugar.latitude = l.latitude;
+            lugar.longitude = l.longitude;
         }
+
+       
 
         this.setState({
             lugar: lugar,
             atualizado : true
         });
     }
+
+    async getLocation() {
+       let localizacao = await this._getLocationAsync();
+       return localizacao;
+    }
+
+    _getLocationAsync = async () => {
+        let { status } = await Permissions.askAsync(Permissions.LOCATION);
+        if (status !== 'granted') {
+            this.setState({
+            errorMessage: 'Permission to access location was denied',
+            });
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+        return location;
+    };
 
     componentDidMount= async () =>  {
         console.log("aqui");
@@ -50,25 +73,48 @@ export default class ModalLugar extends React.Component{
         });
     }
 
+    async salvar(){
+        await Armazenamento.salvar(this.state.lugar);
+        ToastAndroid.show('Salvo com sucesso !', ToastAndroid.SHORT);
+        this.setState({atualizado : false });
+    }
+
     renderMapa(lugar) {
+        if (!lugar.longitude || ! lugar.latitude){
+            return (
+                <View style={styles.container}>
+                    <Text>
+                        Sem Localização
+                    </Text>
+                </View>
+            )
+        }
         return (
-          <MapView
-            style={{ flex: 1 }}
-            initialRegion={{
-              latitude: parseFloat(lugar.latitude),
-              longitude: parseFloat(lugar.longitude),
-              latitudeDelta: 0.02,
-              longitudeDelta: 0.02,
-            }}
-            onRegionChange={region => console.log(region)}
-          >
-            <MapView.Marker draggable
-                coordinate={{
+            <Container style={styles.container}>
+                <MapView
+                    style={{ flex: 1 }}
+                    initialRegion={{
                     latitude: parseFloat(lugar.latitude),
                     longitude: parseFloat(lugar.longitude),
-                }}
-            />
-          </MapView>
+                    latitudeDelta: 0.02,
+                    longitudeDelta: 0.02,
+                    }}
+                    onRegionChange={region => console.log(region)}
+                >
+                    <MapView.Marker draggable
+                        coordinate={{
+                            latitude: parseFloat(lugar.latitude),
+                            longitude: parseFloat(lugar.longitude),
+                        }}
+                    />
+                </MapView>
+                <Content  style={{ margin: 15}}>
+                    <Text>
+                        Latitude:{lugar.latitude + "  "}
+                        Longitude:{lugar.longitude}
+                    </Text>
+                </Content>
+            </Container>
         );
       }
 
@@ -89,7 +135,7 @@ export default class ModalLugar extends React.Component{
                     <Right>
                         {
                             this.state.atualizado ?
-                            <Button transparent onPress={() => Armazenamento.salvar(this.state.lugar)}>
+                            <Button transparent onPress={() => this.salvar.bind(this)()}>
                                 <Text>Salvar</Text>
                             </Button>:
                             null
@@ -125,12 +171,6 @@ export default class ModalLugar extends React.Component{
                     <Tab heading="Localização">
                     <Container style={styles.container}>
                         {this.renderMapa(lugar)}
-                        <Content  style={{ margin: 15}}>
-                            <Text>
-                                Latitude:{lugar.latitude + "  "}
-                                Longitude:{lugar.longitude}
-                            </Text>
-                        </Content>
                     </Container>
                     </Tab>
                     

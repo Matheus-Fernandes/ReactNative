@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity , StyleSheet, FlatList, ScrollView, View} from 'react-native';
-import { Text, Header} from 'native-base';
+import { Text, Header, Footer, FooterTab, Button, Icon} from 'native-base';
 import Armazenamento from '../Armazenamento.js';
 import ModalLugar from './ModalLugar.js';
 
@@ -18,6 +18,19 @@ export default class ListaLugares extends React.Component {
             lugar: item
         });
 
+    }
+
+    adicionar(){
+        let item = {
+            nome: "",
+            descricao : "",
+            longitude : "",
+            latitude : "",
+            base64 : "",
+            imagem : ""
+        }
+
+        this.setModal(item, true);
     }
 
     renderItem = ({item}) => {
@@ -58,6 +71,13 @@ export default class ListaLugares extends React.Component {
                     renderItem={this.renderItem}
                     keyExtractor={extractKey}/>   
             </ScrollView>
+            <Footer>
+                <FooterTab>
+                    <Button primary onPress={() => this.adicionar.bind(this)()}>
+                        <Text style={{fontSize: 15, fontWeight: 'bold'}}>Adicionar Lugar</Text>
+                    </Button>
+                </FooterTab>
+            </Footer>
         </View>
       );
       
